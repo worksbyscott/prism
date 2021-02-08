@@ -1,6 +1,16 @@
-import React from 'react'
-import styles from './styles.module.css'
 
-export const ExampleComponent = ({ text }) => {
-  return <div className={styles.test}>Example Component: {text}</div>
-}
+
+/*
+    Prism funcations
+*/
+
+export { prism } from './prism';
+export { getTransforms } from './prism/animator/progressStep';
+
+/*
+    Prism Components
+*/
+
+
+
+
