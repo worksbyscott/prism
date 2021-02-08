@@ -30,7 +30,7 @@ const App = () => {
   })
 
   return (
-    <div className="prism-test" style={{ transform: 'translateX(100px) ' }}>
+    <div className="prism-test">
       <h1>Prism Testing message</h1>
     </div>
   );
