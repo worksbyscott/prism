@@ -1,6 +1,10 @@
-# prism-animation
+# Prism Animation Library - React 
 
-> Javascript animation library with React support
+> Prism is an standalone tidy animation library that allows you to manpiulate DOM elements in seqenced timelines. 
+
+## Under Development
+
+> This project is currently being created for my honours project at Edinburgh Napier for User Experience Design
 
 [![NPM](https://img.shields.io/npm/v/prism-animation.svg)](https://www.npmjs.com/package/prism-animation) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
