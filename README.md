@@ -13,16 +13,30 @@ npm install --save prism-animation
 ## Usage
 
 ```jsx
-import React, { Component } from 'react'
+import React, { useEffect, Component } from 'react'
 
-import MyComponent from 'prism-animation'
-import 'prism-animation/dist/index.css'
+import { prism } from 'prism-animation'
 
-class Example extends Component {
-  render() {
-    return <MyComponent />
-  }
+const App = () => {
+
+  useEffect(() => {
+    prism({
+      target: ".prism-test",
+      duration: 15000,
+      onPlay: () => console.log("testing message on example"),
+      translateX: 1000,
+    })
+
+  })
+
+  return (
+    <div className="prism-test">
+      <h1>Prism Testing message</h1>
+    </div>
+  );
 }
+
+const 
 ```
 
 ## License
