@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react'
-import { prism, getTransforms } from 'prism-animation'
+import { prism, interpolateColour } from 'prism-animation'
 import 'prism-animation/dist/index.css'
 
 
@@ -14,6 +14,7 @@ const App = () => {
       translateX: 1000,
     })
 
+    console.log(interpolateColour("#eb4034", "#141414", 0.7))
   })
 
   return (

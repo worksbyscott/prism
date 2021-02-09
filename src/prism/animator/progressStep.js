@@ -69,6 +69,7 @@ const getTransforms = (el) => {
     return transforms;
 }
 
+
 const getUnit = (val) => {
     const split = /[+-]?\d*\.?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(val);
     return split && split[1];
