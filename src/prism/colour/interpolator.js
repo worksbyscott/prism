@@ -1,4 +1,6 @@
 
+
+
 const is = {
     hex: a => /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(a),
     rgb: a => /^rgb/.test(a),
@@ -43,6 +45,7 @@ const interpolateColour = (colourA, colourB, progress) => {
 }
 
 export {
+    is,
     interpolateColour,
     convertToRgba,
     hexToRgba,

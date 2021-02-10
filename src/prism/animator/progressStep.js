@@ -1,5 +1,6 @@
 import { validTransforms } from './defaultSettings';
 import { getElements } from '../../utils/getElements';
+import { interpolateColour, is } from '../colour/interpolator';
 
 const generateAnimatables = (target, transition, options) => {
     return getElements(target).map((value, index) => {
@@ -12,6 +13,7 @@ const generateAnimatables = (target, transition, options) => {
                 ...transition
             },
             animations: animationTransitions,
+            progressStep: (progress) => progressAnimatable(this, progress)
         }
     });
 }
@@ -23,7 +25,7 @@ const generateAnimationTransitions = (target, options) => {
             const transitionType = detectTransitionType(target, key);
             const initValue = getInitialValue(target, key, transitionType);
             return {
-                transitionObject: key,
+                transition: key,
                 transitionType: transitionType,
                 transitionUnit: getUnit(target),
                 initValue: initValue,
@@ -55,6 +57,13 @@ const getTransformValue = (target, option) => {
     return 0;
 }
 
+function getElementTransforms(el) {
+    const str = el.style.transform || '';
+    const reg = /(\w+)\(([^)]*)\)/g;
+    const transforms = new Map();
+    let m; while (m = reg.exec(str)) transforms.set(m[1], m[2]);
+    return transforms;
+}
 const getTransitionUnit = (transform) => {
     const perspective = String.includes("perspective")
     const skew = String.includes("skew")
@@ -75,10 +84,35 @@ const getUnit = (val) => {
     return split && split[1];
 }
 
-const progressAnimatable = ({ animatable, frameData }) => {
+const progressAnimatable = (animatable, progress) => {
+    const animationTransitions = animatable.animations;
+    const element = animatable.element;
+    const transition = animatable.transition;
 
-    const delta = frameData.delta;
-    const elapsed = frameData.elapsed;
+    animationTransitions.forEach((transform) => {
+
+        const newValue = ""
+        const initValue = transform.initValue
+        const endValue = transform.endValue
+        const unit = transform.transitionUnit
+
+        let isColour = false
+
+        if (transform.type === "css") {
+            if (is.col(transform.initValue)) {
+                isColour = true;
+                newValue = interpolateColour(initValue, endValue, progress)
+            } else {
+                newValue = (initValue + endValue) * progress
+            }
+            element.style[transform.transition] = `${newValue}${!isColour ?? unit}`
+            return;
+        }
+        if (transform.type == "transform") {
+            newValue = (initValue + endValue) * progress;
+            element.style
+        }
+    })
 
 
 }

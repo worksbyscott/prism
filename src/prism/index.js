@@ -29,15 +29,14 @@ const prism = ({
     let isComplete = false;
     let isPlaying = false;
     let elasped = 0;
+    let progress = 0;
 
     // Animatables are all elements with respecting aninmationOptions
-    let animatables;
+    let animatables = generateAnimatables(target, transition, options);
 
     const play = () => {
         isPlaying = true;
         onPlay && onPlay();
-
-        animatables = generateAnimatables(target, transition, options)
 
         engineController = engine(update);
         engineController.start();
@@ -48,6 +47,7 @@ const prism = ({
 
     const update = (frameData) => {
         elasped += frameData.delta;
+        progress = elasped / duration;
 
         if (!isComplete) {
             if (elasped > duration) {
@@ -55,6 +55,8 @@ const prism = ({
                 complete();
             }
         }
+
+
 
         onUpdate && onUpdate()
     }
@@ -70,7 +72,9 @@ const prism = ({
 
     return {
         stop: () => onStop ?? (onStop() || engineController.stop()),
-        play: () => isPlaying ? play() : console.error("Engine is already playing...")
+        play: () => isPlaying ? play() : console.error("Engine is already playing..."),
+        to: () => { },
+        from: () => { }
     }
 
 }
