@@ -1,7 +1,7 @@
 
 import sync, { cancelSync } from 'framesync';
 import { defaultTransition } from './animator/defaultSettings'
-import { generateAnimatables } from './animator/progressStep';
+import { generateAnimatables, progressAnimatable } from './animator/progressStep';
 
 const prismSync = (update) => {
     const timeStamp = (delta) => update(delta);
@@ -31,6 +31,8 @@ const prism = ({
     let elasped = 0;
     let progress = 0;
 
+    const modifiedProgress;
+
     // Animatables are all elements with respecting aninmationOptions
     let animatables = generateAnimatables(target, transition, options);
 
@@ -56,7 +58,11 @@ const prism = ({
             }
         }
 
-
+        animatables.forEach(anim => {
+            console.log("Updating step for: ")
+            console.log(anim);
+            progressAnimatable(anim, progress)
+        });
 
         onUpdate && onUpdate()
     }
@@ -68,11 +74,28 @@ const prism = ({
         onComplete && onComplete();
     }
 
+    const reset = () => {
+        isPlaying = false;
+        progress = 0;
+        elasped = 0;
+        isComplete = false;
+    }
+
+    const restart = () => {
+        engineController.stop();
+        reset();
+        play();
+    }
+
     autoPlay && play();
 
     return {
-        stop: () => onStop ?? (onStop() || engineController.stop()),
-        play: () => isPlaying ? play() : console.error("Engine is already playing..."),
+        stop: () => {
+            onStop && onStop()
+            engineController.stop()
+        },
+        play: () => play(),
+        restart: () => restart(),
         to: () => { },
         from: () => { }
     }

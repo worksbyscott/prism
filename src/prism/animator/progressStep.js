@@ -1,6 +1,7 @@
 import { validTransforms } from './defaultSettings';
 import { getElements } from '../../utils/getElements';
 import { interpolateColour, is } from '../colour/interpolator';
+import { interpolate } from '../../utils/interpolator'
 
 const generateAnimatables = (target, transition, options) => {
     return getElements(target).map((value, index) => {
@@ -9,9 +10,10 @@ const generateAnimatables = (target, transition, options) => {
             element: value,
             id: index,
             transition: {
-                delay: index * transition.delay,
-                ...transition
+                ...transition,
+                delay: index * transition.delay
             },
+            transforms: getElementTransforms(value),
             animations: animationTransitions,
             progressStep: (progress) => progressAnimatable(this, progress)
         }
@@ -27,7 +29,7 @@ const generateAnimationTransitions = (target, options) => {
             return {
                 transition: key,
                 transitionType: transitionType,
-                transitionUnit: getUnit(target),
+                transitionUnit: getUnit(value),
                 initValue: initValue,
                 finalValue: value
             }
@@ -48,9 +50,19 @@ const getInitialValue = (target, option, type) => {
             : "0"
 }
 
-const getCSSValue = (target, option) => {
-    if (option in target.style) return getComputedStyle(target).getPropertyValue(option) || '0'
+function stringToHyphens(str) {
+    return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
+
+const getCSSValue = (target, option) => {
+    if (option in target.style) {
+        let val = getComputedStyle(target).getPropertyValue(stringToHyphens(option)) || '0'
+        if (!is.col(val)) val = getValueForCSS(val);
+        return val;
+    }
+}
+
+const progressTransform
 
 const getTransformValue = (target, option) => {
     const defaultVal = option.includes('scale') ? 1 : 0 + "px"
@@ -64,10 +76,11 @@ function getElementTransforms(el) {
     let m; while (m = reg.exec(str)) transforms.set(m[1], m[2]);
     return transforms;
 }
+
 const getTransitionUnit = (transform) => {
     const perspective = String.includes("perspective")
     const skew = String.includes("skew")
-    return String.includes()
+    return
 }
 
 const getTransforms = (el) => {
@@ -84,40 +97,71 @@ const getUnit = (val) => {
     return split && split[1];
 }
 
+const getValueForCSS = (val) => {
+    const split = /[+-]?\d*\.?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(val);
+    return split && split[0];
+}
+
 const progressAnimatable = (animatable, progress) => {
     const animationTransitions = animatable.animations;
     const element = animatable.element;
     const transition = animatable.transition;
 
-    animationTransitions.forEach((transform) => {
+    //Updating all transitations for animation
+    animationTransitions.forEach((animation) => {
 
-        const newValue = ""
-        const initValue = transform.initValue
-        const endValue = transform.endValue
-        const unit = transform.transitionUnit
+        //Short values for animation
+        const initValue = animation.initValue
+        const endValue = animation.finalValue
+        const unit = animation.transitionUnit
+        const transforms = animation.transforms;
 
-        let isColour = false
+        //CSS output string 
+        let newValue = ""
+        //Is the animation transistion an colour interpolation
+        let isColour = is.col(initValue || endValue);
 
-        if (transform.type === "css") {
-            if (is.col(transform.initValue)) {
-                isColour = true;
-                newValue = interpolateColour(initValue, endValue, progress)
-            } else {
-                newValue = (initValue + endValue) * progress
+        //TODO: Possible to add object values?
+
+        switch (animation.transitionType) {
+            case "css": {
+
+                // Interpolate start and end value depending on the values
+                // Interpolate supports Numbers, HEX, HSL, RGBA, RGB 
+
+                newValue = interpolate(initValue, endValue, progress);
+
+                //Apply styles to the element for rAF on update
+                element.style[animation.transition] = `${newValue}${!isColour ? unit : ""}`
             }
-            element.style[transform.transition] = `${newValue}${!isColour ?? unit}`
-            return;
+            case "transform": {
+
+                // New Interpolated Value without Unit!
+                newValue = interpolate(initValue, endValue, progress);
+
+                // Output value of the transforms in single line string for transforms on CSS
+                let str = '';
+
+                //Updating transform in animatable transform map
+                transforms.list.set(animation.transition, newValue);
+
+                //Concatanating string for input to CSS
+                transforms.list.forEach((value, prop) => { str += `${prop}(${value}) `; });
+
+                //Applying affect
+                t.style.transform = str;
+
+            }
         }
-        if (transform.type == "transform") {
-            newValue = (initValue + endValue) * progress;
-            element.style
-        }
+
+
     })
 
 
 }
 
 export {
+    progressAnimatable,
     generateAnimatables,
     getTransforms
 }

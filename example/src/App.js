@@ -1,25 +1,37 @@
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { prism, interpolateColour } from 'prism-animation'
 import 'prism-animation/dist/index.css'
 
 
 const App = () => {
 
-  useEffect(() => {
-    prism({
-      target: ".prism-test",
-      duration: 15000,
-      onPlay: () => console.log("testing message on example"),
-      translateX: 1000,
-    })
+  let animation;
 
-    console.log(interpolateColour("#eb4034", "#141414", 0.7))
+  useEffect(() => {
+    animation = prism({
+      target: ".prism-test",
+      duration: 7000,
+      onPlay: () => console.log("testing message on example"),
+      color: "#f2af1d",
+      autoPlay: false
+    })
   })
 
+
+  const triggerAnimation = () => {
+    animation.play();
+  }
+
+  const stopAnimation = () => {
+    animation.stop();
+  }
+
   return (
-    <div className="prism-test" style={{ transform: 'translateX(100px) ' }}>
+    <div className="prism-test" style={{ color: "#f22b1d" }}>
       <h1>Prism Testing message</h1>
+      <button onClick={triggerAnimation}>Animate</button>
+      <button onClick={stopAnimation}>Stop Animation</button>
     </div>
   );
 }

@@ -1,5 +1,17 @@
 
 
+/*
+
+    Interpolator
+
+    Value 1 = Intial value 
+    Value 2 = Final value to animate to
+    progress = Value between 0-1 that represents the percentage of the animation
+
+*/
+
+
+// Colour Funcations
 
 const is = {
     hex: a => /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(a),
@@ -33,9 +45,20 @@ const formatRbga = (colour) => {
     return `rgba(${colour.r},${colour.g},${colour.b})`
 }
 
+
+/*
+    Lerp funcation interpolates two number values 
+*/
+
 const lerp = (start, end, progress) => {
     return start * (1 - progress) + end * progress
 }
+
+/*
+    Interpolate the colour 
+    Accepts: HEX, RBG, RGBA
+
+*/
 
 const interpolateColour = (colourA, colourB, progress) => {
     const [r1, g1, b1, a1] = deconstructRgba(convertToRgba(colourA))
@@ -47,11 +70,19 @@ const interpolateColour = (colourA, colourB, progress) => {
     })
 }
 
+/* 
+
+Core interpolate funcation that suppports all animations
+
+*/
+
+const interpolate = (value1, value2, progress) => {
+    const isColour = is.col(value1) || is.col(value2);
+    return isColour ? interpolateColour(value1, value2, progress) : lerp(value1, value2, progress);
+}
+
 export {
     is,
-    interpolateColour,
-    convertToRgba,
-    hexToRgba,
-    rbgToRgba,
-    deconstructRgba
+    interpolate,
+    interpolateColour
 }
