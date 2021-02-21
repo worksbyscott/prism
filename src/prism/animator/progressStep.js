@@ -1,11 +1,13 @@
-import { validTransforms } from './defaultSettings';
+
 import { getElements } from '../../utils/getElements';
-import { interpolateColour, is } from '../colour/interpolator';
-import { interpolate } from '../../utils/interpolator'
+import { interpolate, is } from '../../utils/interpolator'
+import { getUnit, detectTransitionType, getInitialValue, verifyValue } from '../../utils/transforms'
 
 const generateAnimatables = (target, transition, options) => {
     return getElements(target).map((value, index) => {
-        const animationTransitions = generateAnimationTransitions(value, options);
+        const elementTransforms = getTransforms(value)
+
+        const animationTransitions = generateAnimationTransitions(value, options, elementTransforms);
         return {
             element: value,
             id: index,
@@ -13,75 +15,46 @@ const generateAnimatables = (target, transition, options) => {
                 ...transition,
                 delay: index * transition.delay
             },
-            transforms: getElementTransforms(value),
+            transforms: elementTransforms,
             animations: animationTransitions,
             progressStep: (progress) => progressAnimatable(this, progress)
         }
     });
 }
 
-const generateAnimationTransitions = (target, options) => {
+const generateAnimationTransitions = (target, options, transforms) => {
     return Object.entries(options)
-        .filter(([key, value]) => detectAnimationTransition(target, key))
+        .filter(([key, value]) => detectTransitionType(target, key))
         .map(([key, value]) => {
+
+            //100px = px, 100% = % 
+            //If the value has no unit get default unit for animation type
+            //This accounts for all Transform values deg, rad, px
+
+            // Getting option type = "CSS" || "transform"
             const transitionType = detectTransitionType(target, key);
-            const initValue = getInitialValue(target, key, transitionType);
+
+            //CSS or Transform intial value
+            const initValue = verifyValue(getInitialValue(target, key, transitionType, transforms));
+            const finalValue = verifyValue(value)
+
+            //Unit for the transition (Transform default to px)
+            let unit = getUnit(value) || getUnit(initValue);
+
+            // Inital value if CSS/Transform (without unit
+
             return {
                 transition: key,
                 transitionType: transitionType,
-                transitionUnit: getUnit(value),
+                transitionUnit: unit,
                 initValue: initValue,
-                finalValue: value
+                finalValue: finalValue
             }
         });
 }
 
-const detectAnimationTransition = (target, option) => detectTransitionType(target, option);
 
-const detectTransitionType = (target, option) => {
-    if (validTransforms.includes(option)) return 'transform';
-    if (option in target.style) return "css";
-    return false
-}
 
-const getInitialValue = (target, option, type) => {
-    return type == "css" ? getCSSValue(target, option)
-        : type == "transform" ? getTransformValue(target, option)
-            : "0"
-}
-
-function stringToHyphens(str) {
-    return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
-
-const getCSSValue = (target, option) => {
-    if (option in target.style) {
-        let val = getComputedStyle(target).getPropertyValue(stringToHyphens(option)) || '0'
-        if (!is.col(val)) val = getValueForCSS(val);
-        return val;
-    }
-}
-
-const progressTransform
-
-const getTransformValue = (target, option) => {
-    const defaultVal = option.includes('scale') ? 1 : 0 + "px"
-    return 0;
-}
-
-function getElementTransforms(el) {
-    const str = el.style.transform || '';
-    const reg = /(\w+)\(([^)]*)\)/g;
-    const transforms = new Map();
-    let m; while (m = reg.exec(str)) transforms.set(m[1], m[2]);
-    return transforms;
-}
-
-const getTransitionUnit = (transform) => {
-    const perspective = String.includes("perspective")
-    const skew = String.includes("skew")
-    return
-}
 
 const getTransforms = (el) => {
     const str = el.style.transform || '';
@@ -92,20 +65,12 @@ const getTransforms = (el) => {
 }
 
 
-const getUnit = (val) => {
-    const split = /[+-]?\d*\.?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(val);
-    return split && split[1];
-}
-
-const getValueForCSS = (val) => {
-    const split = /[+-]?\d*\.?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(val);
-    return split && split[0];
-}
 
 const progressAnimatable = (animatable, progress) => {
     const animationTransitions = animatable.animations;
     const element = animatable.element;
     const transition = animatable.transition;
+    const transforms = animatable.transforms;
 
     //Updating all transitations for animation
     animationTransitions.forEach((animation) => {
@@ -114,7 +79,6 @@ const progressAnimatable = (animatable, progress) => {
         const initValue = animation.initValue
         const endValue = animation.finalValue
         const unit = animation.transitionUnit
-        const transforms = animation.transforms;
 
         //CSS output string 
         let newValue = ""
@@ -125,7 +89,6 @@ const progressAnimatable = (animatable, progress) => {
 
         switch (animation.transitionType) {
             case "css": {
-
                 // Interpolate start and end value depending on the values
                 // Interpolate supports Numbers, HEX, HSL, RGBA, RGB 
 
@@ -133,23 +96,32 @@ const progressAnimatable = (animatable, progress) => {
 
                 //Apply styles to the element for rAF on update
                 element.style[animation.transition] = `${newValue}${!isColour ? unit : ""}`
+
+                return;
             }
             case "transform": {
 
+                console.log(animation.transition);
+
+
                 // New Interpolated Value without Unit!
-                newValue = interpolate(initValue, endValue, progress);
+                newValue = interpolate(initValue, endValue, progress).toFixed(2);
 
                 // Output value of the transforms in single line string for transforms on CSS
                 let str = '';
 
-                //Updating transform in animatable transform map
-                transforms.list.set(animation.transition, newValue);
 
-                //Concatanating string for input to CSS
-                transforms.list.forEach((value, prop) => { str += `${prop}(${value}) `; });
+                transforms.set(animation.transition, newValue + (unit ? unit : 0));
 
+
+                transforms.forEach((value, key) => {
+                    str += `${key}(${value}) `;
+                });
+
+                console.log(str);
                 //Applying affect
-                t.style.transform = str;
+                element.style.transform = str;
+
 
             }
         }

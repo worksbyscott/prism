@@ -5,18 +5,15 @@
 */
 
 export { prism } from './prism';
-export { getTransforms } from './prism/animator/progressStep';
 
 /*
-    Prism colour funcations
+    Prism interpolator
 */
 
-export { interpolateColour } from './prism/colour/interpolator.js'
-export { convertToRgba } from './prism/colour/interpolator.js'
-export { hexToRgba } from './prism/colour/interpolator.js'
-export { rbgToRgba } from './prism/colour/interpolator.js'
-export { deconstructRgba } from './prism/colour/interpolator.js'
+export { interpolate } from './utils/interpolator'
+export { convertPx } from './utils/transforms'
 
+export { getElements } from './utils/getElements'
 
 /*
     Prism Components

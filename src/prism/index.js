@@ -11,6 +11,20 @@ const prismSync = (update) => {
     }
 }
 
+/**
+ * Activates the prism animation core funcations
+ *
+ * @param {number} x The number to raise.
+ * @param {number} x The number to raise.
+ * @param {number} x The number to raise.
+ * @param {number} x The number to raise.
+ * @param {number} x The number to raise.
+ * @param {number} x The number to raise.
+ * @param {number} x The number to raise.
+ * @param {number} x The number to raise.
+ * @param {number} n The power, must be a natural number.
+ * @return {number} x raised to the n-th power.
+ */
 const prism = ({
     target,                             //target: Called if the animation is canceled
     autoPlay = true,                    //autoPlay: Called if the animation is canceled
@@ -24,6 +38,8 @@ const prism = ({
 }) => {
 
     const engine = prismSync;
+    const validatedEasing = (progress) => progress;
+
     let engineController;
 
     let isComplete = false;
@@ -31,20 +47,24 @@ const prism = ({
     let elasped = 0;
     let progress = 0;
 
-    const modifiedProgress;
+    let easedProgressed = validatedEasing(progress);
 
     // Animatables are all elements with respecting aninmationOptions
     let animatables = generateAnimatables(target, transition, options);
 
     const play = () => {
+
+        if (isComplete) return;
+
         isPlaying = true;
         onPlay && onPlay();
 
-        engineController = engine(update);
-        engineController.start();
 
         console.log("Animatables:")
         console.log(animatables);
+        engineController = engine(update);
+        engineController.start();
+
     }
 
     const update = (frameData) => {
@@ -52,15 +72,14 @@ const prism = ({
         progress = elasped / duration;
 
         if (!isComplete) {
-            if (elasped > duration) {
+            if (elasped >= duration) {
                 isComplete = true;
                 complete();
+                return;
             }
         }
 
         animatables.forEach(anim => {
-            console.log("Updating step for: ")
-            console.log(anim);
             progressAnimatable(anim, progress)
         });
 

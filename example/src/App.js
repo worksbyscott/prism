@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react'
-import { prism, interpolateColour } from 'prism-animation'
+import { prism, interpolateColour, convertPx, getElements, verifyValue } from 'prism-animation'
 import 'prism-animation/dist/index.css'
 
 
@@ -11,10 +11,10 @@ const App = () => {
   useEffect(() => {
     animation = prism({
       target: ".prism-test",
-      duration: 7000,
-      onPlay: () => console.log("testing message on example"),
-      color: "#f2af1d",
-      autoPlay: false
+      duration: 2000,
+      backgroundColor: "#2a0aa1",
+      rotate: "20deg",
+      autoPlay: false,
     })
   })
 
@@ -28,7 +28,8 @@ const App = () => {
   }
 
   return (
-    <div className="prism-test" style={{ color: "#f22b1d" }}>
+
+    <div className="prism-test" style={{ width: "100%", backgroundColor: "#f22b1d" }}>
       <h1>Prism Testing message</h1>
       <button onClick={triggerAnimation}>Animate</button>
       <button onClick={stopAnimation}>Stop Animation</button>
