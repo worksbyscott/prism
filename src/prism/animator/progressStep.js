@@ -1,8 +1,17 @@
 
 import { getElements } from '../../utils/getElements';
 import { interpolate, is } from '../../utils/interpolator'
-import { getUnit, detectTransitionType, getInitialValue, verifyValue } from '../../utils/transforms'
 
+import { getUnit, detectTransitionType, getInitialValue, verifyValue, getTransforms } from '../../utils/transforms'
+
+/**
+ * Generate the animatable from all options provided
+ * 
+ * @param {element} target Target element to animate
+ * @param {Object} transistion Transistion object with easing
+ * @param {Object} options Animation transition options
+ * @returns {Object} Returns Animatble object to be iterated over
+ */
 const generateAnimatables = (target, transition, options) => {
     return getElements(target).map((value, index) => {
         const elementTransforms = getTransforms(value)
@@ -22,6 +31,14 @@ const generateAnimatables = (target, transition, options) => {
     });
 }
 
+/**
+ * Generate all option transition for the Animatable
+ * 
+ * @param {element} target Target element to animate
+ * @param {Object} options Options objects
+ * @param {Object} transforms Element transforms
+ * @returns {Object} Returns animatable tranistion object
+ */
 const generateAnimationTransitions = (target, options, transforms) => {
     return Object.entries(options)
         .filter(([key, value]) => detectTransitionType(target, key))
@@ -52,19 +69,6 @@ const generateAnimationTransitions = (target, options, transforms) => {
             }
         });
 }
-
-
-
-
-const getTransforms = (el) => {
-    const str = el.style.transform || '';
-    const reg = /(\w+)\(([^)]*)\)/g;
-    const transforms = new Map();
-    let m; while (m = reg.exec(str)) transforms.set(m[1], m[2]);
-    return transforms;
-}
-
-
 
 const progressAnimatable = (animatable, progress) => {
     const animationTransitions = animatable.animations;
@@ -101,8 +105,6 @@ const progressAnimatable = (animatable, progress) => {
             }
             case "transform": {
 
-                console.log(animation.transition);
-
 
                 // New Interpolated Value without Unit!
                 newValue = interpolate(initValue, endValue, progress).toFixed(2);
@@ -118,7 +120,6 @@ const progressAnimatable = (animatable, progress) => {
                     str += `${key}(${value}) `;
                 });
 
-                console.log(str);
                 //Applying affect
                 element.style.transform = str;
 
