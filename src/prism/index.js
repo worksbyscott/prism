@@ -2,7 +2,7 @@
 import sync, { cancelSync } from 'framesync';
 import { defaultTransition } from './animator/defaultSettings'
 import { generateAnimatables, progressAnimatable } from './animator/progressStep';
-
+import { parseEasing } from './animator/easing'
 
 /**
  * Link to the framesync updater engine 
@@ -45,83 +45,79 @@ const prism = ({
     ...options
 }) => {
 
-    const engine = prismSync;
+    const engine = prismSync
+    const parsedEasing = parseEasing(easing)
 
+    let engineController
 
-    let engineController;
-
-    let isComplete = false;
-    let isPlaying = false;
-    let elasped = 0;
-    let progress = 0;
+    let isComplete = false
+    let isPlaying = false
+    let elasped = 0
+    let progress = 0
 
     // Animatables are all elements with respecting aninmationOptions
-    let animatables = generateAnimatables(target, transition, options);
+    let animatables = generateAnimatables(target, transition, options)
 
 
     const play = () => {
-        if (isComplete || isPlaying) return;
+        if (isComplete || isPlaying) return
 
         isPlaying = true;
-        onPlay && onPlay();
+        onPlay && onPlay()
 
         //Start rAF Loop 
-        engineController = engine(update);
-        engineController.start();
+        engineController = engine(update)
+        engineController.start()
 
-        updateAnimatables();
+        updateAnimatables()
     }
 
     //Called on each frame update
     const update = (frameData) => {
-        elasped += frameData.delta;
+        elasped += frameData.delta
 
         if (elasped < delay) return; //Stop updating if the delay peroid hasn't passed
-        progress = (elasped - delay) / duration;
+        progress = (elasped - delay) / duration
 
-        if (!isComplete) {
-            if (elasped >= duration) {
-                isComplete = true;
-                complete();
-                return;
-            }
+        if (!isComplete && elasped >= duration) {
+            isComplete = true
+            complete()
+            return
         }
 
-        updateAnimatables();
+        updateAnimatables()
 
         onUpdate && onUpdate({ elasped, progress })
     }
 
     const updateAnimatables = () => {
-        animatables.forEach(anim => {
-            progressAnimatable(anim, progress)
-        });
+        animatables.forEach(anim => progressAnimatable(anim, parsedEasing(progress)));
     }
 
     const stop = () => {
         isPlaying = false;
-        engineController && engineController.stop();
+        engineController && engineController.stop()
     }
 
     const complete = () => {
-        isPlaying = false;
-        engineController.stop();
-        onComplete && onComplete();
-        updateAnimatables();
+        isPlaying = false
+        engineController.stop()
+        onComplete && onComplete()
+        updateAnimatables()
     }
 
     const reset = () => {
-        isPlaying = false;
-        progress = 0;
-        elasped = 0;
-        isComplete = false;
-        updateAnimatables();
+        isPlaying = false
+        progress = 0
+        elasped = 0
+        isComplete = false
+        updateAnimatables()
     }
 
     const restart = () => {
-        stop();
-        reset();
-        play();
+        stop()
+        reset()
+        play()
     }
 
     autoPlay && play();
