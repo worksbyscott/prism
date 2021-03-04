@@ -2,7 +2,7 @@
 import { getElements } from '../../utils/getElements';
 import { interpolate, is } from '../../utils/interpolator'
 
-import { getUnit, detectTransitionType, getInitialValue, verifyValue, getTransforms } from '../../utils/transforms'
+import { getUnit, detectTransitionType, getInitialValue, verifyValue, getTransforms, convertPx } from '../../utils/transforms'
 
 /**
  * Generate the animatable from all options provided
@@ -52,11 +52,13 @@ const generateAnimationTransitions = (target, options, transforms) => {
             const transitionType = detectTransitionType(target, key);
 
             //CSS or Transform intial value
-            const initValue = verifyValue(getInitialValue(target, key, transitionType, transforms));
-            const finalValue = verifyValue(value)
+            let initValue = getInitialValue(target, key, transitionType, transforms);
 
+            const finalValue = verifyValue(value)
             //Unit for the transition (Transform default to px)
             let unit = getUnit(value) || getUnit(initValue);
+
+            initValue = verifyValue(unit ? convertPx(target, initValue, unit) : initValue)
 
             // Inital value if CSS/Transform (without unit
 
@@ -96,16 +98,15 @@ const progressAnimatable = (animatable, progress) => {
                 // Interpolate start and end value depending on the values
                 // Interpolate supports Numbers, HEX, HSL, RGBA, RGB 
 
-                newValue = interpolate(initValue, endValue, progress);
+                newValue = interpolate(initValue, endValue, progress).toFixed(2);
 
+                const newStr = `${newValue}${!isColour && unit ? unit : ""}`;
                 //Apply styles to the element for rAF on update
-                element.style[animation.transition] = `${newValue}${!isColour ? unit : ""}`
+                element.style[animation.transition] = newStr
 
                 return;
             }
             case "transform": {
-
-
                 // New Interpolated Value without Unit!
                 newValue = interpolate(initValue, endValue, progress).toFixed(2);
 
@@ -122,8 +123,6 @@ const progressAnimatable = (animatable, progress) => {
 
                 //Applying affect
                 element.style.transform = str;
-
-
             }
         }
 

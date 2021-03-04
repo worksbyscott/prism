@@ -82,7 +82,7 @@ const getInitialValue = (target, option, type) => {
  */
 const getInitialCSSValue = (target, option) => {
     if (option in target.style)
-        return getComputedStyle(target).getPropertyValue(stringToHyphens(option)) || '0'
+        return target.style[option] || getComputedStyle(target).getPropertyValue(stringToHyphens(option)) || '0'
 }
 
 /**

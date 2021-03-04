@@ -31,19 +31,19 @@ const prismSync = (update) => {
  * @param {void} onUpdate callback funcation called on each frame update
  * @param {objects} options... all modified CSS and Transforms to animate
  */
-const prism = ({
-    target,                             //target: Called if the animation is canceled
-    autoPlay = true,                    //autoPlay: Called if the animation is canceled
-    duration = 1000,                    //duration: Called if the animation is canceled
-    transition = defaultTransition,     //transition: Called if the animation is canceled
-    delay = 0,
-    easing,
-    onPlay,                             //onPlay: Called if the animation is canceled
-    onComplete,                         //onComplete: Called if the animation is canceled
-    onUpdate,                           //onUpdate: Called if the animation is canceled
-    onStop,                             //onStop: Called if the animation is canceled                        //elasped: Called if the animation is canceled
-    ...options
-}) => {
+const prism = (
+    target, {                           //target: Called if the animation is canceled
+        autoPlay = true,                    //autoPlay: Called if the animation is canceled
+        duration = 1000,                    //duration: Called if the animation is canceled
+        transition = defaultTransition,     //transition: Called if the animation is canceled
+        delay = 0,
+        easing,
+        onPlay,                             //onPlay: Called if the animation is canceled
+        onComplete,                         //onComplete: Called if the animation is canceled
+        onUpdate,                           //onUpdate: Called if the animation is canceled
+        onStop,                             //onStop: Called if the animation is canceled                        //elasped: Called if the animation is canceled
+        ...options
+    }) => {
 
     const engine = prismSync
     const parsedEasing = parseEasing(easing)
@@ -79,7 +79,7 @@ const prism = ({
         if (elasped < delay) return; //Stop updating if the delay peroid hasn't passed
         progress = (elasped - delay) / duration
 
-        if (!isComplete && elasped >= duration) {
+        if (progress >= 1) {
             isComplete = true
             complete()
             return

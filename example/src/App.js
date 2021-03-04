@@ -5,50 +5,35 @@ import { prism } from 'prism-animation'
 
 
 const App = () => {
-  let animation;
+
+  let animation = useRef();
 
   useEffect(() => {
-      prism({
-        target: ".prism-test",
-        duration: 4000,
-        easing: "easeOutCubic",
-        autoPlay: false,
-      })
+    animation.current = prism(".prism-test", {
+      duration: 2000,
+      easing: "easeOutCubic",
+      width: 100,
+      scale: 2,
+
+      autoPlay: false,
+    })
   })
 
-  const animator = prism({
-    target: ".prism-test",
-    duration: 4000,
-    translateX: "1000px",
-    autoPlay: false,
-    onUpdate: () => {},      //Every frame of the animation 60fps
-    onPlay: () => {},       //On animation start
-    onStop: () => {},       //When .stop is called
-    onComplete: () => {},   //When the animation completes
-  })
-
-  animator.play();
-
-  animator.stop();
-
-  animator.reset();
-
-  animator.restart();
 
   const triggerAnimation = () => {
-    animation.play();
+    animation.current.play();
   }
 
   const stopAnimation = () => {
-    animation.stop();
+    animation.current.stop();
   }
 
   const resetAnimation = () => {
-    animation.reset();
+    animation.current.reset();
   }
 
   const restartAnimation = () => {
-    animation.restart();
+    animation.current.restart();
   }
 
   return (
@@ -58,7 +43,7 @@ const App = () => {
           Prism Testing message
         </div>
         <div className="prism-test" style={{ width: "50px", height: "50px", backgroundColor: "#f22b1d" }}></div>
-        
+
         <button onClick={triggerAnimation}>Animate</button>
         <button onClick={stopAnimation}>Stop Animation</button>
         <button onClick={resetAnimation}>Reset Animation</button>
