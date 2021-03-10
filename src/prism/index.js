@@ -1,5 +1,5 @@
 
-import sync, { cancelSync } from 'framesync';
+import sync, { cancelSync } from '../engine';
 import { defaultTransition } from './animator/defaultSettings'
 import { generateAnimatables, progressAnimatable } from './animator/progressStep';
 import { parseEasing } from './animator/easing'
@@ -65,7 +65,7 @@ const prism = (
         isPlaying = true;
         onPlay && onPlay()
 
-        //Start rAF Loop 
+        //Start request Loop 
         engineController = engine(update)
         engineController.start()
 
@@ -135,4 +135,4 @@ const prism = (
 
 export {
     prism
-} 
+}

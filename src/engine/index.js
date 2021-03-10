@@ -1,71 +1,72 @@
-import { onNextFrame, defaultTimestep } from './frames/nextFrame'
 import { createRenderStep } from './frames/preFrame'
+import { onNextFrame, defaultTimestep } from './frames/nextFrame'
 
-const maxElapsed = 40
-let useDefaultElapsed = true
-let runNextFrame = false
-let isProcessing = false
+let maxElapsed = 40;
+let useDefaultElapsed = true;
+let runNextFrame = false;
+let isProcessing = false;
 
-const frame = {
+let frame = {
     delta: 0,
     timestamp: 0,
 }
 
-const stepsOrder = [
+const renderStages = [
     "read",
     "update",
-    "preRender",
     "render",
-    "postRender",
-]
+];
 
-const steps = stepsOrder.reduce((acc, key) => {
-    acc[key] = createRenderStep(() => (runNextFrame = true))
-    return acc
-})
+const stages = renderStages.reduce((accumulator, key) => {
+    accumulator[key] = createRenderStep(() => (runNextFrame = true))
+    return accumulator
+}, {});
 
-const sync = stepsOrder.reduce((acc, key) => {
-    const step = steps[key]
-    acc[key] = (process, keepAlive = false, immediate = false) => {
+const sync = renderStages.reduce((accumulator, key) => {
+    const step = stages[key]
+    accumulator[key] = (process, keepAlive = false, immediate = false) => {
         if (!runNextFrame) startLoop()
         return step.schedule(process, keepAlive, immediate)
     }
-    return acc
-})
+    return accumulator
+}, {});
 
-const cancelSync = stepsOrder.reduce((acc, key) => {
-    acc[key] = steps[key].cancel
-    return acc
-})
 
-const processStep = (stepId) => steps[stepId].process(frame)
+const cancelSync = renderStages.reduce((accumulator, key) => {
+    accumulator[key] = stages[key].cancel
+    return accumulator
+}, {});
+
+const processStep = (stepId) => stages[stepId].process(frame)
 
 const processFrame = (timestamp) => {
-    runNextFrame = false
+
+    runNextFrame = false;
 
     frame.delta = useDefaultElapsed
         ? defaultTimestep
         : Math.max(Math.min(timestamp - frame.timestamp, maxElapsed), 1)
 
     frame.timestamp = timestamp
-
     isProcessing = true
-    stepsOrder.forEach(processStep)
+    renderStages.forEach(processStep)
     isProcessing = false
 
     if (runNextFrame) {
-        useDefaultElapsed = false
-        onNextFrame(processFrame)
+        useDefaultElapsed = false;
+        onNextFrame(processFrame);
     }
+
 }
 
 const startLoop = () => {
     runNextFrame = true
     useDefaultElapsed = true
-    if (!isProcessing) onNextFrame(processFrame)
+    if (!isProcessing)
+        onNextFrame(processFrame)
 }
 
 const getFrameData = () => frame
 
+export { getFrameData, cancelSync }
 export default sync
-export { sync, cancelSync, getFrameData }

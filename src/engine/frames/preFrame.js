@@ -1,55 +1,55 @@
-export const createRenderStep = (runNextFrame) => {
+const createRenderStep = (runNextFrame) => {
 
-    let toRun = []
-    let toRunNextFrame = []
-    let numToRun = 0
-    let isProcessing = false
-    const toKeepAlive = new WeakSet()
+    var toRun = [];
+    var toRunNextFrame = [];
+    var numToRun = 0;
+    var isProcessing = false;
+    var toKeepAlive = new WeakSet();
 
-    const step = {
-        schedule: (callback, keepAlive = false, immediate = false) => {
-            const addToCurrentFrame = immediate && isProcessing
-            const buffer = addToCurrentFrame ? toRun : toRunNextFrame
+    var step = {
 
-            if (keepAlive) toKeepAlive.add(callback)
-
+        schedule: function (callback, keepAlive, immediate) {
+            if (keepAlive === void 0) { keepAlive = false; }
+            if (immediate === void 0) { immediate = false; }
+            var addToCurrentFrame = immediate && isProcessing;
+            var buffer = addToCurrentFrame ? toRun : toRunNextFrame;
+            if (keepAlive)
+                toKeepAlive.add(callback);
             if (buffer.indexOf(callback) === -1) {
-                buffer.push(callback)
-                if (addToCurrentFrame && isProcessing) numToRun = toRun.length
+                buffer.push(callback);
+                if (addToCurrentFrame && isProcessing)
+                    numToRun = toRun.length;
             }
-
-            return callback
+            return callback;
         },
-
-        cancel: (callback) => {
-            const index = toRunNextFrame.indexOf(callback)
-            if (index !== -1) toRunNextFrame.splice(index, 1)
-
-            toKeepAlive.delete(callback)
+        cancel: function (callback) {
+            var index = toRunNextFrame.indexOf(callback);
+            if (index !== -1)
+                toRunNextFrame.splice(index, 1);
+            toKeepAlive.delete(callback);
         },
-
-        process: (frameData) => {
+        process: function (frameData) {
+            var _a;
             isProcessing = true;
-
-            [toRun, toRunNextFrame] = [toRunNextFrame, toRun]
-            toRunNextFrame.length = 0
-            numToRun = toRun.length
-
+            _a = [toRunNextFrame, toRun], toRun = _a[0], toRunNextFrame = _a[1];
+            toRunNextFrame.length = 0;
+            numToRun = toRun.length;
             if (numToRun) {
-                for (let i = 0; i < numToRun; i++) {
-                    const callback = toRun[i]
-
-                    callback(frameData)
-
+                for (var i = 0; i < numToRun; i++) {
+                    var callback = toRun[i];
+                    callback(frameData);
                     if (toKeepAlive.has(callback)) {
-                        step.schedule(callback)
-                        runNextFrame()
+                        step.schedule(callback);
+                        runNextFrame();
                     }
                 }
             }
-            isProcessing = false
+            isProcessing = false;
         },
-    }
+    };
+    return step;
+}
 
-    return step
+export {
+    createRenderStep
 }
