@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { prism } from '../index'
 
 const usePrism = (element, ...props) => {
     const prismAnimator = useRef();

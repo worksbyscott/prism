@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react'
-import { prism } from 'prism-animation'
+import { prism, PrismComponent } from 'prism-animation'
 
 
 
@@ -21,9 +21,11 @@ const App = () => {
     prism(".prism-test2", {
       duration: 2000,
       easing: "easeOutCubic",
-      width: "100%",
-      delay: 1000
+      fontSize: "50px",
+      opacity: 1
     })
+
+
   })
 
 
@@ -50,12 +52,25 @@ const App = () => {
           Prism Testing message
         </div>
         <div className="prism-test" style={{ width: "50px", height: "50px", backgroundColor: "#f22b1d" }}></div>
-        <div className="prism-test2" style={{ width: "50px", height: "50px", backgroundColor: "#f22b1d" }}></div>
+        <div className="prism-test2">
+          <h1>Hello World</h1>
+        </div>
 
         <button onClick={triggerAnimation}>Animate</button>
         <button onClick={stopAnimation}>Stop Animation</button>
         <button onClick={resetAnimation}>Reset Animation</button>
         <button onClick={restartAnimation}>Restart Animation</button>
+
+        <PrismComponent
+          animation={{
+            duration: 2000,
+            easing: "easeOutCubic",
+            fontSize: "50px",
+            autoPlay: false,
+            opacity: 1
+          }}>
+          <h1>Test</h1>
+        </PrismComponent>
       </div>
     </>
   );

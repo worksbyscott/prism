@@ -123,12 +123,17 @@ const prism = (
     autoPlay && play();
 
     return {
+        info: {
+            elasped: elasped,
+            progress: progress,
+            isComplete: isComplete,
+            isPlaying: isPlaying,
+            elasped: elasped
+        },
         stop: () => stop(),
         reset: () => reset(),
         play: () => play(),
-        restart: () => restart(),
-        to: () => { },
-        from: () => { }
+        restart: () => restart()
     }
 
 }

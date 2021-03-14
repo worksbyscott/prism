@@ -67,7 +67,7 @@ const interpolateColour = (colourA, colourB, progress) => {
         r: Math.round(lerp(r1, r2, progress)),
         g: Math.round(lerp(g1, g2, progress)),
         b: Math.round(lerp(b1, b2, progress)),
-        b: Math.round(lerp(a1, a2, progress)),
+        a: Math.round(lerp(a1, a2, progress)),
     })
 }
 

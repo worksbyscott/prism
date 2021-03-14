@@ -7,7 +7,7 @@ const useIntersection = (ref, options) => {
         if (ref.current && typeof IntersectionObserver === 'function') {
             const handler = (entries) => {
                 setIntersectionObserverEntry(entries[0]);
-            };
+            }
 
             const observer = new IntersectionObserver(handler, options);
             observer.observe(ref.current);
@@ -15,9 +15,9 @@ const useIntersection = (ref, options) => {
             return () => {
                 setIntersectionObserverEntry(null);
                 observer.disconnect();
-            };
+            }
         }
-        return () => { };
+        return () => { }
     }, [ref.current, options.threshold, options.root, options.rootMargin]);
 
     return intersectionObserverEntry;

@@ -1,36 +1,40 @@
 
-import { useIntersection } from '../../hooks/useIntersection';
+import useIntersection from '../../hooks/useIntersection';
+import { prism } from '../index'
+import React, { useRef, useEffect } from 'react'
 
-export const prismComponent = ({ triggerOnScroll, ...props }) => {
+export const PrismComponent = ({
+    triggerOnScroll,
+    animation,
+    ...props 
+}) => {
     //Proxy div element ref for oberserver and prism
-    const elementRef = useRef()
+    const elementRef = useRef(null)
 
     /**
      * Prism needs to be initlized during useEffect
      * as element needs to be loaded to DOM
      */
-    const prism = usePrism(elementRef.current, {
-        duration: 2000,
-        easing: "easeOutCubic",
-        width: 100,
-        scale: 2,
-        autoPlay: false,
-    });
+    let prismRef = useRef(null)
 
     //Basic react hook to detect element intersection 
     const intersection = useIntersection(elementRef, {
         root: null,
         rootMargin: "0px",
-        threshold: 10
-    })
+        threshold: 0.2
+    });
+
+    //Add the animation once the component is mounted
+    useEffect(() => {
+        prismRef.current = prism(elementRef.current, { ...animation, autoPlay: (triggerOnScroll ? false : true) })
+    }, [elementRef])
 
 
-    if (intersection
-        && triggerOnScroll
-        && intersection.intersectionRatio < 0.2) {
-        prism.play();
+    //Implement triggerOnScroll 
+    if (triggerOnScroll && intersection && intersection.intersectionRatio > 0.2) {
+        console.log("Shoudl play animation");
+        prismRef.current.play();
     }
-
 
     return (
         <div ref={elementRef} {...props}>
