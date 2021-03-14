@@ -6,11 +6,9 @@
 
 ### Docs
 
-Check out [documentation](prism.worksbyscott.uk) for guides and a full API reference.
+Check out [documentation](https://prism.worksbyscott.uk) for guides and a full API reference.
 
-### Github
-
-This project is open source and licensed under the MIT license. Check out the project on github [github](https://github.com/worksbyscott/prism-animation
+This project is open source and licensed under the MIT license. Check out the project on [github](https://github.com/worksbyscott/prism-animation)
 
 ## Install & Usage
 
@@ -29,7 +27,20 @@ prism(“.prism-test”, {
 
 ```
 
-## React implmentation
+## Supported Props
+
+Prism supports animation of all CSS attributes, transforms and colours.
+
+```js
+
+prism(“.prism-test”, {
+    translateX: 1000
+    duration: 2000
+})
+
+```
+
+## React implementation 
 
 Prism also takes advantage of reacts use of JXS to provide an 
 PrismComponent and inline Component version of the Prism
@@ -60,4 +71,4 @@ For all API references check out our documentation.
 
 MIT © [worksbyscott](https://github.com/worksbyscott)
 
-Made by [Worksbyscott](worksbyscott.uk)
+Made by [Worksbyscott](https://worksbyscott.uk)
