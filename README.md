@@ -1,6 +1,6 @@
 # Prism Animation Library - React 
 
-> Prism is an lightweight (Under 20kb) yet powerful Javascript library created for React To allow developers to produce tween animations on elements with any CSS and transform value.  
+> Prism is an lightweight yet powerful Javascript library created for React To allow developers to produce tween animations on elements with any CSS and transform value.  
 
 [![NPM](https://img.shields.io/npm/v/prism-animation.svg)](https://www.npmjs.com/package/prism-animation) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 

@@ -7,7 +7,11 @@ import { parseEasing } from './animator/easing'
 /**
  * Link to the framesync updater engine 
  * 
- * @param {void} update Target element to animate
+ * possible to calculate render on update and cal of write
+ * 
+ * @param {void} update Update funcation for the tween class
+ * 
+ * 
  */
 const prismSync = (update) => {
     const timeStamp = (delta) => update(delta);
@@ -48,7 +52,7 @@ const prism = (
     const engine = prismSync
     const parsedEasing = parseEasing(easing)
 
-    let engineController
+    let engineInput
 
     let isComplete = false
     let isPlaying = false
@@ -65,9 +69,9 @@ const prism = (
         isPlaying = true;
         onPlay && onPlay()
 
-        //Start request Loop 
-        engineController = engine(update)
-        engineController.start()
+        //Start raF Loop 
+        engineInput = engine(update)
+        engineInput.start()
 
         updateAnimatables()
     }
@@ -77,16 +81,18 @@ const prism = (
         elasped += frameData.delta
 
         if (elasped < delay) return; //Stop updating if the delay peroid hasn't passed
-        progress = (elasped - delay) / duration
+        progress = Math.min((elasped - delay) / duration, 1) //Make sure the progress is no higher than 1
 
-        if (progress >= 1) {
+        if (progress === 1) {
             isComplete = true
             complete()
             return
         }
 
+        //Calculate and rendeer all animatables
         updateAnimatables()
 
+        //API Callback for users 
         onUpdate && onUpdate({ elasped, progress })
     }
 
@@ -96,12 +102,12 @@ const prism = (
 
     const stop = () => {
         isPlaying = false;
-        engineController && engineController.stop()
+        engineInput && engineInput.stop()
     }
 
     const complete = () => {
         isPlaying = false
-        engineController.stop()
+        engineInput.stop()
         onComplete && onComplete()
         updateAnimatables()
     }
@@ -120,16 +126,15 @@ const prism = (
         play()
     }
 
+    //Start the animation
     autoPlay && play();
 
     return {
-        info: {
-            elasped: elasped,
-            progress: progress,
-            isComplete: isComplete,
-            isPlaying: isPlaying,
-            elasped: elasped
-        },
+        elasped: elasped,
+        progress: progress,
+        isComplete: isComplete,
+        isPlaying: isPlaying,
+        elasped: elasped,
         stop: () => stop(),
         reset: () => reset(),
         play: () => play(),

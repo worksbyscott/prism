@@ -3,6 +3,7 @@ import { stringToHyphens, stringContains } from './stringUtils'
 import { validTransforms } from '../prism/animator/defaultSettings';
 
 // Caching premade values
+// GetComputedStyle can be performance heavy 
 const cache = {
     CSS: {}
 }
