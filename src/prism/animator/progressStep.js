@@ -1,6 +1,7 @@
 
 import { getElements } from '../../utils/getElements';
 import { interpolate, is } from '../../utils/interpolator'
+import Type from '../../utils/AnimationType'
 
 import { getUnit, detectTransitionType, getInitialValue, verifyValue, getTransforms, convertPx } from '../../utils/transforms'
 
@@ -75,7 +76,7 @@ const generateAnimationTransitions = (target, options, transforms) => {
 const progressAnimatable = (animatable, progress) => {
     const animationTransitions = animatable.animations;
     const element = animatable.element;
-    const transition = animatable.transition;
+    //const transition = animatable.transition;
     const transforms = animatable.transforms;
 
     //Updating all transitations for animation
@@ -94,7 +95,7 @@ const progressAnimatable = (animatable, progress) => {
         //TODO: Possible to add object values?
 
         switch (animation.transitionType) {
-            case "css": {
+            case Type.CSS: {
                 // Interpolate start and end value depending on the values
                 // Interpolate supports Numbers, HEX, HSL, RGBA, RGB 
 
@@ -106,16 +107,14 @@ const progressAnimatable = (animatable, progress) => {
 
                 return;
             }
-            case "transform": {
+            case Type.TRANSFORM: {
                 // New Interpolated Value without Unit!
                 newValue = interpolate(initValue, endValue, progress).toFixed(2);
 
                 // Output value of the transforms in single line string for transforms on CSS
                 let str = '';
 
-
                 transforms.set(animation.transition, newValue + (unit ? unit : 0));
-
 
                 transforms.forEach((value, key) => {
                     str += `${key}(${value}) `;

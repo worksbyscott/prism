@@ -1,8 +1,20 @@
 
-import sync, { cancelSync } from '../engine';
+import engine, { stopEngine } from '../engine';
 import { defaultTransition } from './animator/defaultSettings'
 import { generateAnimatables, progressAnimatable } from './animator/progressStep';
 import { parseEasing } from './animator/easing'
+
+
+/**
+ * TODOS: 
+ * 
+ * Remove Transition setting reimplement it to contain easing and duration (Cleaner)
+ * Split the prism tween into its own method would make it more dynamic for the component
+ * Add bezier easing
+ * Add Loops
+ * Staggering of elements would have to give each element its own tween rather than grouping
+ * 
+ *  */
 
 /**
  * Link to the framesync updater engine 
@@ -13,11 +25,11 @@ import { parseEasing } from './animator/easing'
  * 
  * 
  */
-const prismSync = (update) => {
+const prismEngine = (update) => {
     const timeStamp = (delta) => update(delta);
     return {
-        start: () => sync.update(timeStamp, true, true),
-        stop: () => cancelSync.update(timeStamp)
+        start: () => engine.update(timeStamp, true, true),
+        stop: () => stopEngine.update(timeStamp)
     }
 }
 
@@ -49,7 +61,7 @@ const prism = (
         ...options
     }) => {
 
-    const engine = prismSync
+    const engine = prismEngine
     const parsedEasing = parseEasing(easing)
 
     let engineInput
@@ -66,7 +78,7 @@ const prism = (
     const play = () => {
         if (isComplete || isPlaying) return
 
-        isPlaying = true;
+        isPlaying = true
         onPlay && onPlay()
 
         //Start raF Loop 
@@ -89,7 +101,7 @@ const prism = (
             return
         }
 
-        //Calculate and rendeer all animatables
+        //Calculate and render all animatables
         updateAnimatables()
 
         //API Callback for users 
@@ -127,7 +139,7 @@ const prism = (
     }
 
     //Start the animation
-    autoPlay && play();
+    autoPlay && play()
 
     return {
         elasped: elasped,

@@ -1,15 +1,12 @@
 import { is } from './interpolator'
 import { stringToHyphens, stringContains } from './stringUtils'
 import { validTransforms } from '../prism/animator/defaultSettings';
+import Type from "../utils/AnimationType"
 
 // Caching premade values
 // GetComputedStyle can be performance heavy 
 const cache = {
     CSS: {}
-}
-
-function arrayContains(arr, val) {
-    return arr.some(a => a === val);
 }
 
 
@@ -34,14 +31,13 @@ function convertPx(el, value, unit) {
 
     const preUnits = [unit, 'deg', 'rad', 'turn'];
 
-    if (arrayContains(preUnits, valueUnit)) return value;
+    if (preUnits.some(a => a === valueUnit)) return value;
 
     //To prevent DOM thrashing if the calculation has already been done
     const cached = cache.CSS[value + unit];
 
     if (!(cached === undefined)) return cached;
 
-    //Ch
     const baseline = 100;
     const tempEl = document.createElement(el.tagName);
     const parentEl = (el.parentNode && (el.parentNode !== document)) ? el.parentNode : document.body;
@@ -68,8 +64,8 @@ function convertPx(el, value, unit) {
  * @param {*} type 
  */
 const getInitialValue = (target, option, type) => {
-    return type == "css" ? getInitialCSSValue(target, option)
-        : type == "transform" ? getInitialTransformValue(target, option)
+    return type == Type.CSS ? getInitialCSSValue(target, option)
+        : type == Type.TRANSFORM ? getInitialTransformValue(target, option)
             : "0"
 }
 
@@ -141,8 +137,8 @@ const getUnit = (val) => {
 */
 
 const detectTransitionType = (target, option) => {
-    if (validTransforms.includes(option)) return 'transform';
-    if (option in target.style) return "css";
+    if (validTransforms.includes(option)) return Type.TRANSFORM;
+    if (option in target.style) return Type.CSS;
 }
 
 /*

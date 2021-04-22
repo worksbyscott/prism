@@ -3,10 +3,21 @@ import useIntersection from '../../hooks/useIntersection';
 import { prism } from '../index'
 import React, { useRef, useEffect } from 'react'
 
+//Intersection Trigger Settings
+//Can be changed in PrismComponent
+
+//ADD TO PRISM DOCUMENTATION!!!!
+const defaultTriggerSettings = {
+    threshold: 0.2,
+    root: null,
+    rootMargin: "0px"
+}
+
 export const PrismComponent = ({
     triggerOnScroll,
+    triggerSettings,
     animation,
-    ...props 
+    ...props
 }) => {
     //Proxy div element ref for oberserver and prism
     const elementRef = useRef(null)
@@ -18,11 +29,8 @@ export const PrismComponent = ({
     let prismRef = useRef(null)
 
     //Basic react hook to detect element intersection 
-    const intersection = useIntersection(elementRef, {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.2
-    });
+    //Merge the default setting with additional settings
+    const intersection = useIntersection(elementRef, { defaultTriggerSettings, ...triggerSettings });
 
     //Add the animation once the component is mounted
     useEffect(() => {
@@ -32,7 +40,6 @@ export const PrismComponent = ({
 
     //Implement triggerOnScroll 
     if (triggerOnScroll && intersection && intersection.intersectionRatio > 0.2) {
-        console.log("Shoudl play animation");
         prismRef.current.play();
     }
 

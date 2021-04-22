@@ -7,19 +7,19 @@ const parseEasing = (easing) => {
     const defaultEaseFunction = easingFunctions[defaultEase];
     //Setting default easing
 
-    console.log("EASING FOUND: " + easing);
+    //console.log("EASING FOUND: " + easing);
 
     let easeFunction = defaultEaseFunction;
 
     if (typeof easing === 'string') {
         const easefunc = easingFunctions[easing];
-        console.log("String found " + easefunc);
+        //console.log("String found " + easefunc);
         easeFunction = easefunc ? easefunc : defaultEaseFunction;
     }
 
-    if (typeof ease === 'array') 
+    if (typeof ease === 'array')
         easeFunction = easing.lenght() === 4 ? bezier(easing) : defaultEaseFunction
-    
+
     return easeFunction;
 }
 

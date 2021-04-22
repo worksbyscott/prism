@@ -16,5 +16,3 @@ export { interpolate } from './utils/interpolator'
 export { convertPx } from './utils/transforms'
 export { getElements } from './utils/getElements'
 
-
-
